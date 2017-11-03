@@ -1,21 +1,22 @@
 import Ember from 'ember';
 
-export default Ember.Component.extend({
-  updateRentalForm: false,
+export default Ember.Route.extend({
+  model(params) {
+    return this.store.findRecord('rental', params.rental_id);
+  },
   actions: {
-    updateRentalForm() {
-      this.set('updateRentalForm', true);
+    update(rental, params) {
+      Object.keys(params).forEach(function(key) {
+        if(params[key]!==undefined) {
+          rental.set(key,params[key]);
+        }
+      });
+      rental.save();
+      this.transitionTo('index');
     },
-    update(rental) {
-      var params = {
-        owner: this.get('owner'),
-        city: this.get('city'),
-        type: this.get('type'),
-        image: this.get('image'),
-        bedrooms: this.get('bedrooms'),
-      };
-      this.set('updateRentalForm', false);
-      this.sendAction('update', rental, params);
+    destroyRental(rental) {
+      rental.destroyRecord();
+      this.transitionTo('index');
     }
   }
 });
